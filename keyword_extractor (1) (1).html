@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extrator de Palavras-Chave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #3b82f6, #00c9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            color: #94a3b8;
+        }
+
+        .input-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-input {
+            width: 100%;
+            height: 200px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .text-input::placeholder {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .counters {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .counter {
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(0, 201, 255, 0.2));
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #00c9ff;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.5);
+        }
+
+        .controls-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-container {
+            margin-bottom: 25px;
+        }
+
+        .slider-label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #3b82f6;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.8);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3b82f6, #00c9ff);
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3b82f6, #00c9ff);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #00c9ff;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.5);
+        }
+
+        .extract-btn {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #3b82f6, #00c9ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .extract-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 201, 255, 0.6);
+        }
+
+        .extract-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .results-section.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .keyword-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .keyword-item:hover {
+            border-color: #00c9ff;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.3);
+        }
+
+        .keyword-rank {
+            font-weight: 700;
+            color: #00c9ff;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        .keyword-word {
+            flex-grow: 1;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .keyword-count {
+            background: linear-gradient(45deg, #3b82f6, #00c9ff);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+
+            .input-section, .controls-section, .results-section {
+                padding: 20px;
+            }
+
+            .counters {
+                justify-content: center;
+            }
+
+            .counter {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+
+            .keyword-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .keyword-rank {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .keyword-item {
+                padding: 12px;
+            }
+
+            .extract-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Extrator de Palavras-Chave</h1>
+            <p>Descubra as palavras mais frequentes em seus textos</p>
+        </div>
+
+        <div class="input-section">
+            <textarea 
+                class="text-input" 
+                id="textInput" 
+                placeholder="Cole ou digite seu texto aqui... (em português ou inglês)"
+            ></textarea>
+            <div class="counters">
+                <div class="counter">
+                    Caracteres: <span id="charCount">0</span>
+                </div>
+                <div class="counter">
+                    Palavras: <span id="wordCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="slider-container">
+                <label class="slider-label">Quantas palavras-chave extrair:</label>
+                <div class="slider-wrapper">
+                    <input type="range" min="1" max="99" value="10" class="slider" id="keywordSlider">
+                </div>
+                <div class="slider-value">
+                    Selecionadas: <span id="sliderValue">10</span> palavras-chave
+                </div>
+            </div>
+            <button class="extract-btn" id="extractBtn">
+                ⚡ Extrair Palavras-Chave
+            </button>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2 class="results-title">📊 Palavras-Chave Encontradas</h2>
+            <div id="keywordsList"></div>
+        </div>
+
+        <div class="footer">
+            Kauã Vinicius 2° A
+        </div>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const wordCount = document.getElementById('wordCount');
+        const keywordSlider = document.getElementById('keywordSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const extractBtn = document.getElementById('extractBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const keywordsList = document.getElementById('keywordsList');
+
+        // Função para remover acentos
+        function removeAccents(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        // Função para limpar texto
+        function cleanText(text) {
+            return removeAccents(text)
+                .toLowerCase()
+                .replace(/[^\w\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // Função para contar palavras e caracteres
+        function updateCounts() {
+            const text = textInput.value;
+            const chars = text.length;
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            
+            charCount.textContent = chars;
+            wordCount.textContent = words;
+        }
+
+        // Função para atualizar o valor do slider
+        function updateSliderValue() {
+            sliderValue.textContent = keywordSlider.value;
+        }
+
+        // Função para extrair palavras-chave
+        function extractKeywords() {
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                alert('Por favor, insira um texto para extrair as palavras-chave!');
+                return;
+            }
+
+            const cleanedText = cleanText(text);
+            const words = cleanedText.split(' ').filter(word => word.length > 2);
+            
+            // Contar frequência das palavras
+            const wordFreq = {};
+            words.forEach(word => {
+                wordFreq[word] = (wordFreq[word] || 0) + 1;
+            });
+
+            // Ordenar por frequência
+            const sortedWords = Object.entries(wordFreq)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, parseInt(keywordSlider.value));
+
+            // Exibir resultados
+            displayResults(sortedWords);
+        }
+
+        // Função para exibir resultados
+        function displayResults(keywords) {
+            keywordsList.innerHTML = '';
+            
+            keywords.forEach((keyword, index) => {
+                const [word, count] = keyword;
+                const keywordItem = document.createElement('div');
+                keywordItem.className = 'keyword-item';
+                keywordItem.style.animationDelay = `${index * 0.1}s`;
+                
+                keywordItem.innerHTML = `
+                    <span class="keyword-rank">${index + 1}º</span>
+                    <span class="keyword-word">"${word}"</span>
+                    <span class="keyword-count">${count} vezes</span>
+                `;
+                
+                keywordsList.appendChild(keywordItem);
+            });
+
+            // Mostrar seção de resultados com animação
+            resultsSection.classList.add('show');
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Event listeners
+        textInput.addEventListener('input', updateCounts);
+        textInput.addEventListener('paste', () => {
+            setTimeout(updateCounts, 10);
+        });
+
+        keywordSlider.addEventListener('input', updateSliderValue);
+        extractBtn.addEventListener('click', extractKeywords);
+
+        // Permitir extração com Enter (Ctrl+Enter)
+        textInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                extractKeywords();
+            }
+        });
+
+        // Inicializar contadores
+        updateCounts();
+        updateSliderValue();
+    </script>
+</body>
+</html>
